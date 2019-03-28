@@ -55,6 +55,6 @@ Class init: Base
 
 The difference is the `Beta2` and `Beta1` entries just before the `Base` entry. I had not expected those to be be included in this chain because in my mind the `Alpha` chain had "priority" (my own concept). 
 
-In retrospect Python is just walking down the [`mro` (method resolution order](https://www.python.org/download/releases/2.3/mro/) chain. When thinking about it that way it makes perfect sense, but it is not what I had intuitively expected.
+In retrospect Python is just walking down the [`mro` (method resolution order)](https://www.python.org/download/releases/2.3/mro/) chain. When thinking about it that way it makes perfect sense, but it is not what I had intuitively expected.
 
-When designing class hrarchies I am going to have to keep this in mind. Usually this is not an issue since in normal cases multiple inheritance is only used for "mixin" purposes, and the additional chains don't have `__init__` methods (the most likely one to be chained with `super`). But it was an interesting find to me.
+When designing class hierarchies I am going to have to keep this in mind. Usually this is not an issue since in normal cases multiple inheritance is only used for "mixin" purposes, and the additional chains don't have `__init__` methods (the most likely one to be chained with `super`). But it was an interesting find to me.
