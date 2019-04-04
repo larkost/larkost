@@ -37,7 +37,7 @@ the problem](Python_Object_Decorators.md).
 
 But it is possible to make a decorator that works on all three of these styles, and works on
 `methods` as well as `functions`, but it takes a some thinking. Rather than go through all that
-work, you an just start with my version:
+work, you can just start with my version:
 
 ```python
 import functools
