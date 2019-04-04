@@ -6,6 +6,11 @@ some nasty gotchas. Overall I think that this is a spot in Python that could use
 but that is a topic for another day. This article is documentation of one way through this that
 tries to avoid almost all the potholes.
 
+Edit 4/4/2019: I just stumbled across
+[another article](https://pybit.es/decorator-optional-argument.html) that references the "Python 
+cookbook 3rd edition" as having another solution similar to mine (search for "Allow for optional 
+arguments" on that page).
+
 Ways of using decorators
 ------------------------
 
