@@ -13,16 +13,16 @@ I also had a list of things I wanted:
 - Auto-create intermediate levels when accessing items deeper in
 - Do this all without a lot of boilerplate on the individual classes
 - Work like normal `dict`s for iterating and things like `keys()`
-- Ability to use `__slots__` to improve space useage and speed
+- Ability to use `__slots__` to improve space usage and speed
 - Default all unset (and undefaulted) values to `None`
 
 The example here provides all of those. There were some thorny problems to overcome:
 - `pprint` explicitly checks for `dict`, so you have to be a subclass to get recursive printing
-- `dict` actually impliments most of its functions in C, so you have to override everything
+- `dict` actually implements most of its functions in C, so you have to override everything
 - `collections.MutableMapping` provides some of this, but does not understand slots
 - `__slots__` are great, but don't play well with universal ways of listing things
 
-Note: At present this is not compatible with Python 3, but that may be doable.
+Update Sep 18, 2019: This has been updated to work for both Python2.7 and Python3.0.
 
 Examples
 --------
@@ -55,29 +55,36 @@ Source
 ------
 
 ```python
-import collections
-import inspect
-import types
+try:
+    from collections.abc import MutableMapping
+except ImportError:  # Python 2.x
+    from collections import MutableMapping
 
-
-class AttrDict(collections.MutableMapping, dict):
+class AttrDict(MutableMapping, dict):
     _allowed_values = {}
     __keys = None
 
     def __init__(self, **kwargs):
-        '''Use the object dict'''
-        self.__keys = {x[0] for x in inspect.getmembers(self) if not x[0].startswith('_') and not callable(x[1])}
-        if self._allowed_values:
-            self.__keys.update(self._allowed_values.keys())
+        """Use the object dict"""
+
+        if not self.__keys:
+            self.__keys = set()
+
+        # find any pre-set keys
         if hasattr(self, '__slots__'):
-            self.__keys.update(self.__slots__)
+            keys = {x for x in dir(self) if x not in self.__slots__}  # empty slots trigger AttributeErrors
+        else:
+            keys = set(dir(self))
+        self.__keys.update({x for x in keys if not x.startswith('_') and not callable(getattr(self, x))})
+
+        # fill in any init-time values
         for key, value in kwargs.items():
             self[key] = value
 
     def __setitem__(self, key, value):
         if key in self._allowed_values:
             expected_type = self._allowed_values[key]
-        elif hasattr(self, key) or not self._allowed_values:
+        elif key.startswith('_') or key in self.__keys or not self._allowed_values or '__all__' in self._allowed_values:
             expected_type = '__any__'
         else:
             raise AttributeError("%s has no attribute '%s'" % (self.__class__.__name__, key))
@@ -96,24 +103,22 @@ class AttrDict(collections.MutableMapping, dict):
     __setattr__ = __setitem__
 
     def __getitem__(self, key):
-        if hasattr(self, key):
-            try:
-                return object.__getattribute__(self, key)
-            except AttributeError:
-                return None
-        elif key in self._allowed_values:
-            allowed_types = self._allowed_values[key]
-            if not isinstance(allowed_types, (list, set, tuple)):
-                allowed_types = (allowed_types,)
-            for allowed_type in allowed_types:
-                if issubclass(allowed_type, (dict, list, set)):
-                    # if we have a modifable container defined for this key, auto-create it
-                    self.__setattr__(key, allowed_type())
-                    return object.__getattribute__(self, key)
+        try:
+            return object.__getattribute__(self, key)
+        except AttributeError:
+            if key in self._allowed_values:
+                allowed_types = self._allowed_values[key]
+                if not isinstance(allowed_types, (list, set, tuple)):
+                    allowed_types = (allowed_types,)
+                for allowed_type in allowed_types:
+                    if issubclass(allowed_type, (dict, list, set)):
+                        # if we have a modifiable container defined for this key, auto-create it
+                        self.__setattr__(key, allowed_type())
+                        return object.__getattribute__(self, key)
+                else:
+                    return None
             else:
-                return None
-        else:
-            raise AttributeError("%s object has no attribute `%s`" % (self.__class__.__name__, key))
+                raise AttributeError("%s object has no attribute `%s`" % (self.__class__.__name__, key))
 
     __getattr__ = __getitem__
 
