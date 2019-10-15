@@ -6,6 +6,7 @@ Python:
 - [Universal Decorators Example](tech/Python_Universal_Decorators.md)
 - [Broken Class-style Decorators](tech/Python_Object_Decorators.md)
 - [A Preferences Class](tech/Python_Preferences.md)
+- [Using Click with Classes](tech/Python_Click_with_Classes.md)
 
 Presentations:
 - Oct 9, 2019 presentation at Whiterabbit.ai Architecture club on
