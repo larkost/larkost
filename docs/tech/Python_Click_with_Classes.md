@@ -101,13 +101,13 @@ class ClickCommandMetaclass(type):
             if name == 'click_group':
                 continue
 
-            def find_callback(target):
-                """Find the actual callback at the end of a stack of click.Command instances"""
+            def find_final_command(target):
+                """Find the last call command at the end of a stack of click.Command instances"""
                 while isinstance(target.callback, click.Command):
                     target = target.callback
                 return target
 
-            command_target = find_callback(command)
+            command_target = find_final_command(command)
 
             if not isinstance(command_target.callback, ClickInstantiator):
                 # the top class to implement this
@@ -115,8 +115,8 @@ class ClickCommandMetaclass(type):
             else:
                 # this is a subclass function, copy it and replace the klass
                 setattr(klass, name, copy.deepcopy(command))
-                command_target = find_callback(getattr(klass, name))
-                command_target.callback.klass = klass
+                command = getattr(klass, name)
+                find_final_command(getattr(klass, name)).callback.klass = klass
 
             # now add it to the group
             klass.click_group.add_command(command, name)
