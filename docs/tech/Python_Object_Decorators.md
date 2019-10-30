@@ -96,5 +96,5 @@ without using parentheses. But it is still an annoying problem. I am seeing this
 and 3.4.3.
 
 All of this seems overly-complicated, and non-Pythonic to me. But if you want decorators that work
-in all of these cases, use my [universal decorator example](Python_Universal_Decorators.md) as a
+in all of these cases, use my [universal decorator example](Python_Universal_Decorators.html) as a
 starting point.
