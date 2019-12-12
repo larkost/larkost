@@ -8,6 +8,9 @@ Python:
 - [A Preferences Class](tech/Python_Preferences.md)
 - [Using Click with Classes](tech/Python_Click_with_Classes.md)
 
+ElasticStack:
+- [Setting up APM in `docker-compose`](tech/APM_Docker_Setup.md)
+
 Presentations:
 - Oct 9, 2019 presentation at Whiterabbit.ai Architecture club on
   `importlib` and Singletons in Python ( 
